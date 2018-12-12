@@ -1,0 +1,32 @@
+{
+  "name": "lfb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "big.js": "^5.2.2",
+    "bytewise": "^1.1.0",
+    "charwise": "^3.0.1",
+    "level": "^4.0.0",
+    "level-fact-base": "^1.0.0",
+    "levelup": "^3.1.1",
+    "monotonic-lexicographic-timestamp": "^1.0.0",
+    "pg": "^7.7.1",
+    "pg-query-stream": "^1.1.2",
+    "pull-flatmap": "0.0.1",
+    "pull-paramap": "^1.2.2",
+    "pull-stream": "^3.6.9",
+    "rambda": "^1.2.6",
+    "sqldown": "^2.1.0",
+    "sqlite3": "^4.0.4",
+    "stream-to-pull-stream": "^1.7.2",
+    "subleveldown": "^3.0.1",
+    "uuid": "^3.3.2"
+  }
+}
