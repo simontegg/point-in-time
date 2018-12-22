@@ -37,13 +37,19 @@ function factory (db, schema) {
 
   return {
     txns,
+    tr,
+
+    snap: tr.snap,
+
     transact: function (entities, callback) {
       const now = new Date().getTime()
+      let schemaByAttr
 
       return pull(
         pull.once(tr),
         pull.asyncMap((tr, cb) => tr.snap(cb)),
         pull.asyncMap((snap, cb) => {
+          schemaByAttr = snap.schema.byAttr
           const nextId = snap.txn + 1
           const nextDecimal = pad(nextId)
 
@@ -59,7 +65,11 @@ function factory (db, schema) {
             delete entity.create
           }
 
-          entity[`${name}_updatedAt`] = now
+          const updatedAt = `${name}_updatedAt`
+
+          if (schemaByAttr[updatedAt]) {
+            entity[updatedAt] = now
+          }
 
           return entity
         }),
