@@ -1,25 +1,12 @@
 const lfb = require('../lfb')
 const pull = require('pull-stream')
+const promise = require('./promise')
 
-function promise (stream) {
-  return new Promise ((resolve, reject) => {
-    return pull(
-      stream,
-      pull.drain(
-        resolve,
-        err => {
-          if (err) {
-            return reject(err)
-          }
-        }
-      )
-    )
-  })
-}
 
 const tuples = [
   ['?relId', 'relationship_subjectId',      '?id'],
   ['?relId', 'relationship_objectId',      '?orgId'],
+  ['?relId', 'relationship_type',      '?type'],
   ['?id',  'person_name',        '?name']
 ]
 
@@ -27,7 +14,12 @@ function membersByOrgId (_, { organizationId }) {
   return promise(pull(
     pull.once(lfb),
     pull.asyncMap((lfb, cb) => lfb.snap(cb)),
-    pull.asyncMap((fb, cb) => fb.q(tuples, { orgId: organizationId }, ['id', 'name'], cb))
+    pull.asyncMap((fb, cb) => fb.q(
+      tuples, 
+      { orgId: organizationId, type: 'member_of' }, 
+      ['id', 'name'], 
+      cb
+    ))
   ))
 }
 
