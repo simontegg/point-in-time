@@ -49,24 +49,26 @@ async function seed () {
   //
   try {
 
-  const qSet = await staging('kotahi.question_set')
-    .select()
+    const qSet = await staging('kotahi.question_set')
+      .select()
 
-  const qSets = map(QSet, qSet)
-  const questionSetMap = zipObj(map(qs => qs.qSet_name, qSets), map(qs => qs.$e, qSets))
+    const qSets = map(QSet, qSet)
+    const questionSetMap = zipObj(map(qs => qs.qSet_name, qSets), map(qs => qs.$e, qSets))
 
     const r = await staging('kotahi.request').select()
 
     console.log({qSets, questionSetMap});
 
-  const request = map(Request(questionSetMap), r)
+    const request = map(Request(questionSetMap), r)
 
-  console.log({request});
+    console.log({request});
+
+    const ents = qSets.concat(request)
 
 
 
 
-    // await t.tr.transact(ents)
+    await t.tr.transact(ents)
 
   } catch (err) {
     console.log({err});
