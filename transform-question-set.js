@@ -3,17 +3,19 @@ const stringify = require('fast-json-stable-stringify')
 
 function transformQuestionSet ({ 
   name
-  created_at,
-  updated_at
+  // created_at,
+  // updated_at
 }) {
+  const now = new Date()
+
   const qSet = {
     $e: Uuid(),
     qSet_name: name,
-    qSet_createdAt: created_at,
-    qSet_updatedAt: created_at
+    qSet_createdAt: now,
+    qSet_updatedAt: now
   }
 
-  return answer
+  return qSet
 }
 
 module.exports = transformQuestionSet

@@ -10,7 +10,6 @@ const transformRequest = questionSetMap => ({
   sent_by,
   sent_at,
   updated_at,
-  received_at,
   submitted_at
 }) => {
   const request = {
@@ -20,11 +19,11 @@ const transformRequest = questionSetMap => ({
     request_requestorId: requestor_id,
     request_requesteeId: requestee_id,
     request_sentBy: sent_by,
-    request_createdAt: sent_at,
-    request_updatedAt: updated_at,
-    request_receivedAt: received_at,
-    request_submittedAt: request_submittedAt
+    request_createdAt: new Date(sent_at),
+    request_updatedAt: new Date(updated_at)
   }
+
+  if (submitted_at) request.request_submittedAt = submitted_at
 
   return request
 }

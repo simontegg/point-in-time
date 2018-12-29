@@ -22,11 +22,13 @@ const t = factory(db, schema)
 
 
 
-const { map } = require('rambda')
+const { map, pluck, zipObj } = require('rambda')
 const stringify = require('fast-json-stable-stringify')
 
 const Agent = require('./transform-agent')
 const Relationship = require('./transform-relationship')
+const Request = require('./transform-request')
+const QSet = require('./transform-question-set')
 
 
 const performance = Knex(knexfile.performance)
@@ -37,15 +39,34 @@ async function seed () {
     // .select()
 //
   // const ents = map(Agent, agents)
+//
+//
+  // const rels = await staging('kotahi.relationship')
+    // .select()
+//
+  // const ents = map(Relationship, rels)
   //
+  //
+  try {
 
-  const rels = await staging('kotahi.relationship')
+  const qSet = await staging('kotahi.question_set')
     .select()
 
-  const ents = map(Relationship, rels)
+  const qSets = map(QSet, qSet)
+  const questionSetMap = zipObj(map(qs => qs.qSet_name, qSets), map(qs => qs.$e, qSets))
 
-  try {
-    await t.tr.transact(ents)
+    const r = await staging('kotahi.request').select()
+
+    console.log({qSets, questionSetMap});
+
+  const request = map(Request(questionSetMap), r)
+
+  console.log({request});
+
+
+
+
+    // await t.tr.transact(ents)
 
   } catch (err) {
     console.log({err});
