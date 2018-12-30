@@ -1,10 +1,12 @@
 const Uuid = require('uuid/v4')
 const stringify = require('fast-json-stable-stringify')
+const { map } = require('rambda')
 
 function transformQuestion ({ 
   id, 
   identifier,
   version,
+  language,
   question_set_ids,
   section,
   section_order,
@@ -21,8 +23,8 @@ function transformQuestion ({
     question_order: section_order,
     question_schema: stringify(schema),
     question_ui: stringify(ui),
-    question_createdAt: created_at,
-    question_updatedAt: created_at
+    question_createdAt: new Date(created_at),
+    question_updatedAt: new Date(created_at)
   }
 
   const qsetQuestions = map(qsetId => ({
@@ -32,7 +34,7 @@ function transformQuestion ({
     create: true
   }), question_set_ids || [])
 
-  qsetQuestions.shift(question)
+  qsetQuestions.push(question)
 
   return qsetQuestions
 }

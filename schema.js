@@ -40,12 +40,19 @@ module.exports = {
   qSet_updatedAt:            { type: 'Date' },
 
   // questionsets have many questions
-  qSetQuestion_qsetId:       { type: 'EntityID' },
+  qSetQuestion_qSetId:       { type: 'EntityID' },
   qSetQuestion_questionId:   { type: 'EntityID' },
   qSetQuestion_createdAt:    { type: 'Date' },
   qSetQuestion_updatedAt:    { type: 'Date' },
 
   question_body:             { type: 'String' },
+  question_identifier:       { type: 'String' }, 
+  question_version:          { type: 'Integer' },
+  question_language:         { type: 'String' },
+  question_section:          { type: 'String' },
+  question_order:            { type: 'Integer' },
+  question_schema:           { type: 'String' },
+  question_ui:               { type: 'String'},
   question_createdAt:        { type: 'Date' },
   question_updatedAt:        { type: 'Date' },
 
@@ -94,9 +101,5 @@ module.exports = {
   reportFiles_fileId:        { type: 'EntityID' },
   reportFiles_reportsId:     { type: 'EntityID' },
   reportFiles_createdAt:     { type: 'Date' },
-  reportFiles_updatedAt:     { type: 'Date' },
-
-
-
-
+  reportFiles_updatedAt:     { type: 'Date' }
 }

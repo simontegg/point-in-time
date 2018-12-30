@@ -22,32 +22,36 @@ const t = factory(db, schema)
 
 
 
-const { map, pluck, zipObj } = require('rambda')
+const { flatten, map, pluck, zipObj } = require('rambda')
 const stringify = require('fast-json-stable-stringify')
 
 const Agent = require('./transform-agent')
 const Relationship = require('./transform-relationship')
 const Request = require('./transform-request')
 const QSet = require('./transform-question-set')
+const Question = require('./transform-question')
 
 
 const performance = Knex(knexfile.performance)
 const staging = Knex(knexfile.staging)
 
 async function seed () {
-  // const agents = await staging('kotahi.agent')
-    // .select()
-//
-  // const ents = map(Agent, agents)
-//
-//
-  // const rels = await staging('kotahi.relationship')
-    // .select()
-//
-  // const ents = map(Relationship, rels)
-  //
-  //
   try {
+    const a = await staging('kotahi.agent')
+      .select()
+  //
+    const agents = map(Agent, a)
+  //
+  //
+    const rels = await staging('kotahi.relationship')
+      .select()
+
+    const rel = map(Relationship, rels)
+
+    const q = await staging('kotahi.question')
+      .select()
+
+    const questions = flatten(map(Question, q))
 
     const qSet = await staging('kotahi.question_set')
       .select()
@@ -57,13 +61,15 @@ async function seed () {
 
     const r = await staging('kotahi.request').select()
 
-    console.log({qSets, questionSetMap});
-
     const request = map(Request(questionSetMap), r)
 
-    console.log({request});
 
-    const ents = qSets.concat(request)
+    const ents = agents
+      .concat(rel)
+      .concat(questions)
+      .concat(qSets)
+      .concat(request)
+      
 
 
 

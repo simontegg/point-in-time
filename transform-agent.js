@@ -1,15 +1,6 @@
 const Uuid = require('uuid/v4')
 const stringify = require('fast-json-stable-stringify')
 
-    // id                  UUID         DEFAULT uuid_generate_v4(),
-                        // PRIMARY KEY(id),
-    // agent_type          TEXT NOT NULL,
-    // nzbn_business_type  TEXT NOT NULL DEFAULT 'N/A',
-    // legal_entity_type   LTREE,
-    // body                JSONB DEFAULT '{}', -- TODO enforce NOT NULL
-    // created_at          TIMESTAMPTZ,
-    // updated_at          TIMESTAMPTZ
-
 
 function transformAgent ({ 
   id,
@@ -41,15 +32,6 @@ function transformAgent ({
     org_createdAt: new Date(created_at) || now,
     org_updatedAt: new Date(updated_at) || now
   }
-
-  console.log(org.org_createdAt);
-
-  if (!created_at) {
-
-    console.log((org));
-    
-  }
-
 
 
   if (legal_entity_type) org.org_legalEntityType = legal_entity_type
