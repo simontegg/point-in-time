@@ -5,14 +5,13 @@ const promise = require('./promise')
 
 
 const questions = [
- // ['?qSetId',         'qSet_name',                '?name'],
-
-
-  ['?qSetQuestionId', 'qSetQuestion_qSetId',      '?qSetId'],
-  ['?qSetQuestionId', 'qSetQuestion_questionId',  '?questionId']
+ ['?qSetId',         'qSet_name',                '?name'],
 //
-  // ['?questionId',     'question_body',            '?body'],
-  // ['?questionId',     'question_identifier',      '?identifier']
+//
+  ['?qSetQuestionId', 'qSetQuestion_qSetId',      '?qSetId'],
+  ['?qSetQuestionId', 'qSetQuestion_questionId',  '?questionId'],
+//
+  ['?questionId',     'question_identifier',      '?identifier']
 ]
 
 
@@ -22,8 +21,8 @@ function questionsByQuestionSetId (_, { name }) {
     pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       questions, 
-      { }, 
-      ['qSetId', 'questionId'],
+      { name }, 
+      ['questionId', 'identifier'],
       cb
     ))
   ))
@@ -33,7 +32,7 @@ function questionsByQuestionSetId (_, { name }) {
 async function test () {
 
   try {
-    const request = await questionsByQuestionSetId(null, { name: 'Main Question Set' })
+    const request = await questionsByQuestionSetId(null, { name: 'Central TAS Desk Audit Question Set' })
     console.log(request);
     //
     // const stream = lfb.txns.createReadStream()

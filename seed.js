@@ -66,7 +66,6 @@ async function seed () {
 
     const request = map(Request(questionSetMap), r)
 
-
     const ents = agents
       .concat(rel)
       .concat(questions)
@@ -74,21 +73,13 @@ async function seed () {
       .concat(qSetQuestions)
       .concat(request)
 
-    for (let i = 0; i < ents.length; i++) {
-      if (!ents[i].$e) {
-        console.log(ents[i]);
-      }
-
-    }
-
-
-    await t.seed(ents)
+    console.log(questions)
+   // await t.seed(ents)
 
   } catch (err) {
     console.log({err});
   }
 
-  // console.log(ents);
 
 
 

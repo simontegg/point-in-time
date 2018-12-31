@@ -45,7 +45,6 @@ module.exports = {
   qSetQuestion_createdAt:    { type: 'Date' },
   qSetQuestion_updatedAt:    { type: 'Date' },
 
-  question_body:             { type: 'String' },
   question_identifier:       { type: 'String' }, 
   question_version:          { type: 'Integer' },
   question_language:         { type: 'String' },
