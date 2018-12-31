@@ -83,13 +83,56 @@ function factory (db, schema) {
       )
     },
 
+    seed: function (entities, callback) {
+      const now = new Date().getTime()
+      let schemaByAttr
+
+      return pull(
+        pull.once(tr),
+        pull.asyncMap((tr, cb) => tr.snap(cb)),
+        pull.asyncMap((snap, cb) => {
+          schemaByAttr = snap.schema.byAttr
+          const nextId = snap.txn + 1
+          const nextDecimal = pad(nextId)
+
+          // transaction keys unique combination of epoch and padded transaction no.
+          txns.put(`${now}.${nextDecimal}`, nextId, cb)
+        }),
+        pull.drain(
+          () => tr.transact(entities, callback),
+          err => err ? callback(err) : null
+        )
+      )
+    },
+
     pointInTime: function (epoch, query, callback) {
 
       // fetch most recent db version before queryed epoch
       const lte = `${epoch}.9999999999999999`
+      let found = false
+
+      const txnStream = txns.createReadStream({ lte, reverse: true, limit: 1 })
+
+      txnStream.on('data', () => { found = true })
+
+      txnStream.on('close', () => {
+        if (!found) {
+          // epoch earlier than transaction time
+          // callback with earliest transaction
+          return pull(
+            pull.once(3),
+            pull.asyncMap(tr.asOf),
+            pull.asyncMap((fb, cb) => fb.q(query[0], query[1], query[2], cb)),
+            pull.drain(
+              results => callback(null, results),
+              err => err ? callback(err) : null
+            )
+          )
+        }
+      })
 
       return pull(
-        toPull.source(txns.createReadStream({ lte, reverse: true, limit: 1 })),
+        toPull.source(txnStream),
         pull.map(txn => Number(txn.value)),
         pull.asyncMap(tr.asOf),
         pull.asyncMap((fb, cb) => fb.q(query[0], query[1], query[2], cb)),

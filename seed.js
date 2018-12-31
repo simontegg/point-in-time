@@ -74,7 +74,7 @@ async function seed () {
 
 
 
-    await t.tr.transact(ents)
+    await t.seed(ents)
 
   } catch (err) {
     console.log({err});

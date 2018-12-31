@@ -3,75 +3,29 @@ const pull = require('pull-stream')
 
 const promise = require('./promise')
 
-const tuples = [
-  ['?id',           'request_name',         '?name'],
-  ['?id',           'request_qSetId',       '?qSetId'],
-  ['?id',           'request_requestorId',  '?requestorId'],
-  ['?id',           'request_requesteeId',  '?requesteeId'],
-  ['?id',           'request_sentBy',       '?sentBy'],
-  ['?id',           'request_createdAt',    '?createdAt'],
-  ['?id',           'request_submittedAt',  '?submittedAt'],
-  ['?id',           'request_updatedAt',    '?updatedAt'],
-//
-  ['?qSetId',       'qSet_name',            '?questionSetName'],
-//
-  ['?requestorId',  'org_name',          '?requestorName'],
-
-  ['?requesteeId',  'org_name',          '?requesteeName']
-]
 
 const questions = [
-  ['?qSetQuestionId', 'qSetQuestion_qSetId',      '?qSetId'],
-  ['?qSetQuestionId', 'qSetQuestion_questionId',  '?questionId'],
+ // ['?qSetId',         'qSet_name',                '?name'],
 
-  ['?questionId',     'question_body',            '?body'],
-  ['?questionId',     'question_identifier',      '?identifier']
+
+  ['?qSetQuestionId', 'qSetQuestion_qSetId',      '?qSetId'],
+  ['?qSetQuestionId', 'qSetQuestion_questionId',  '?questionId']
+//
+  // ['?questionId',     'question_body',            '?body'],
+  // ['?questionId',     'question_identifier',      '?identifier']
 ]
 
 
-function requestById (_, { id }) {
+function questionsByQuestionSetId (_, { name }) {
   return promise(pull(
     pull.once(lfb),
     pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
-      tuples, 
-      { id: id }, 
-      [
-        'id',
-        'name',
-        'qSetId',
-        'requestorId',
-        'requesteeId',
-        'requestorName',
-        'requesteeName',
-        'createdAt',
-        'submittedAt',
-        'updatedAt'
-      ], 
+      questions, 
+      { }, 
+      ['qSetId', 'questionId'],
       cb
-    )),
-    pull.flatten(),
-    pull.asyncMap((request, cb) => {
-      const { createdAt, qSetId } = request
-      const createdAtEpoch = new Date(createdAt).getTime()
-
-      lfb.pointInTime(
-        createdAtEpoch, 
-        [
-          questions,
-          { qSetId },
-          [ 'questionId', 'body']
-        ],
-        cb
-        // (err, res) => {
-          // console.log({res});
-//
-//
-        // }
-        )
-
-      // cb(null, request)
-    })
+    ))
   ))
 }
 
@@ -79,7 +33,7 @@ function requestById (_, { id }) {
 async function test () {
 
   try {
-    const request = await requestById(null, { id: '51ebe37f-0c0e-4637-a4ec-3af3eccb86c4' })
+    const request = await questionsByQuestionSetId(null, { name: 'Main Question Set' })
     console.log(request);
     //
     // const stream = lfb.txns.createReadStream()
