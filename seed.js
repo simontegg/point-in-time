@@ -22,7 +22,7 @@ const t = factory(db, schema)
 
 
 
-const { flatten, map, pluck, zipObj } = require('rambda')
+const { filter, flatten, map, pluck, zipObj } = require('rambda')
 const stringify = require('fast-json-stable-stringify')
 
 const Agent = require('./transform-agent')
@@ -51,12 +51,15 @@ async function seed () {
     const q = await staging('kotahi.question')
       .select()
 
-    const questions = flatten(map(Question, q))
+    const questions = map(Question, q)
 
     const qSet = await staging('kotahi.question_set')
       .select()
 
-    const qSets = map(QSet, qSet)
+    const qs = map(QSet, qSet)
+    const qSets = map(q => q[0], qs)
+    const qSetQuestions = flatten(map(q => q[1], qs))
+
     const questionSetMap = zipObj(map(qs => qs.qSet_name, qSets), map(qs => qs.$e, qSets))
 
     const r = await staging('kotahi.request').select()
@@ -68,10 +71,15 @@ async function seed () {
       .concat(rel)
       .concat(questions)
       .concat(qSets)
+      .concat(qSetQuestions)
       .concat(request)
-      
 
+    for (let i = 0; i < ents.length; i++) {
+      if (!ents[i].$e) {
+        console.log(ents[i]);
+      }
 
+    }
 
 
     await t.seed(ents)

@@ -27,16 +27,7 @@ function transformQuestion ({
     question_updatedAt: new Date(created_at)
   }
 
-  const qsetQuestions = map(qsetId => ({
-    e$: Uuid(),
-    qsetQuestion_questionId: id,
-    qsetQuestion_qsetId: qsetId,
-    create: true
-  }), question_set_ids || [])
-
-  qsetQuestions.push(question)
-
-  return qsetQuestions
+  return question
 }
 
 module.exports = transformQuestion

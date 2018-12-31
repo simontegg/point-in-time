@@ -1,8 +1,10 @@
 const Uuid = require('uuid/v4')
 const stringify = require('fast-json-stable-stringify')
+const { map } = require('rambda')
 
 function transformQuestionSet ({ 
-  name
+  name,
+  question_ids
   // created_at,
   // updated_at
 }) {
@@ -15,7 +17,16 @@ function transformQuestionSet ({
     qSet_updatedAt: now
   }
 
-  return qSet
+  const qSetQuestions = map(qId => ({
+    $e: Uuid(),
+    qSetQuestion_questionId: qId,
+    qSetQuestion_qSetId: qSet.$e,
+    qSetQuestion_createdAt: now,
+    qSetQuestion_updatedAt: now,
+  }), question_ids || [])
+
+
+  return [qSet, qSetQuestions]
 }
 
 module.exports = transformQuestionSet
