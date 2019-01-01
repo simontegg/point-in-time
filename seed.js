@@ -78,7 +78,8 @@ async function seed () {
       .concat(qSetQuestions)
       .concat(request)
 
-      await t.seed(ents)
+    console.log(answers);
+      // await t.seed(ents)
 
   } catch (err) {
     console.log({err});

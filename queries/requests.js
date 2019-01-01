@@ -62,40 +62,51 @@ const requestSelect = [
 ]
 
 function requestById (_, { currentOrgId, id }) {
+  let result
+
   return promise(pull(
     pull.once(lfb),
     pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(tuples, { id }, requestSelect, cb)),
     pull.flatten(),
     pull.asyncMap((request, cb) => {
+      result = request
       const { createdAt, qSetId } = request
       const asyncOperations = [
         { op: questionsAtCreated, date: createdAt, qSetId },
         getAnswersOp(request, currentOrgId)
       ]
 
-      console.log(asyncOperations);
-
-      cb(null, asyncOperations)
-
-      // fetchQuestionsAndAnswers(asyncOperations, cb)
+      fetchQuestionsAndAnswers(asyncOperations, cb)
     }),
-    pull.map(results => {
-      
-      const [questions, answers] = results
+    pull.map(([questions, answers]) => {
+      result.questions = questions
+      result.answers = answers
 
-      console.log(questions.length);
-      console.log(answers.length);
-
-      return [questions, answers]
+      return result
     })
   ))
+}
+
+function getAnswersOp ({ submittedAt, requestorId, requesteeId, qSetId }, currentOrgId) {
+  // query answers at submitted point in time
+  if (submittedAt) {
+    return { op: answersAtSubmitted, date: submittedAt, qSetId, orgId: requesteeId }
+  }
+
+  // requestor cannot access answers until request submitted
+  if (currentOrgId === requestorId && !submittedAt) {
+    return { op: (_, cb) => cb(null, []) }
+  }
+
+  // query live answers
+  return { op: currentAnswers, qSetId, orgId: requesteeId }
 }
 
 function fetchQuestionsAndAnswers (asyncOperations, callback) {
   return pull(
     pull.values(asyncOperations),
-    paramap(({ op, date, qSetId }, cb) => op({ date, qSetId }, cb)),
+    paramap(({ op, date, qSetId, orgId }, cb) => op({ date, qSetId, orgId }, cb)),
     pull.collect(callback)
   )
 }
@@ -122,7 +133,7 @@ function answersAtSubmitted ({ date, qSetId, orgId }, callback) {
     [
       answers,
       { qSetId, orgId },
-      [ 'id', 'questionId', 'model', 'createdAt', 'updatedAt']
+      [ 'id', 'questionId', 'model', 'createdAt', 'updatedAt', 'orgId']
     ],
     callback
   )
@@ -142,31 +153,17 @@ function currentAnswers ({ qSetId, orgId }, callback) {
   )
 }
 
-function getAnswersOp ({ submittedAt, requestorId, requesteeId, qSetId }, currentOrgId) {
-  // query answers at submitted point in time
-  if (submittedAt) {
-    return { op: answersAtSubmitted, date: submittedAt, qSetId, orgId: requesteeId }
-  }
-
-  // requestor cannot access answers until request submitted
-  if (currentOrgId === requestorId && !submittedAt) {
-    return { op: (_, cb) => cb(null, []) }
-  }
-
-  // query live answers
-  return { op: currentAnswers, qSetId, orgId: requesteeId }
-}
-
 
 async function test () {
 
   try {
     const request = await requestById(
       null, 
-      { id: '51ebe37f-0c0e-4637-a4ec-3af3eccb86c4', currentOrgId: 'ca29c42a-5a5e-4943-b076-f62ccb63bc31' }
+      { id: '51ebe37f-0c0e-4637-a4ec-3af3eccb86c4', currentOrgId: 'ca29c42a-5a5e-4943-b076-f62ccb63bc32' }
     )
 
-    console.log(request);
+    console.log(request.answers.length);
+    console.log(request.requestorId);
 
   const diff = process.hrtime(time);
   // [ 1, 552 ]
