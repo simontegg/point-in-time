@@ -48,27 +48,24 @@ const answers = [
   ['?id',             'answer_updatedAt',         '?updatedAt']
 ]
 
+const requestSelect = [
+  'id',
+  'name',
+  'qSetId',
+  'requestorId',
+  'requesteeId',
+  'requestorName',
+  'requesteeName',
+  'createdAt',
+  'submittedAt',
+  'updatedAt'
+]
+
 function requestById (_, { currentOrgId, id }) {
   return promise(pull(
     pull.once(lfb),
     pull.asyncMap((lfb, cb) => lfb.snap(cb)),
-    pull.asyncMap((fb, cb) => fb.q(
-      tuples, 
-      { id: id }, 
-      [
-        'id',
-        'name',
-        'qSetId',
-        'requestorId',
-        'requesteeId',
-        'requestorName',
-        'requesteeName',
-        'createdAt',
-        'submittedAt',
-        'updatedAt'
-      ], 
-      cb
-    )),
+    pull.asyncMap((fb, cb) => fb.q(tuples, { id }, requestSelect, cb)),
     pull.flatten(),
     pull.asyncMap((request, cb) => {
       const { createdAt, qSetId } = request
@@ -79,13 +76,18 @@ function requestById (_, { currentOrgId, id }) {
 
       console.log(asyncOperations);
 
-      fetchQuestionsAndAnswers(asyncOperations, cb)
+      cb(null, asyncOperations)
+
+      // fetchQuestionsAndAnswers(asyncOperations, cb)
     }),
     pull.map(results => {
-      console.log(results[0].length);
-      console.log(results[1].length);
+      
+      const [questions, answers] = results
 
-      return results
+      console.log(questions.length);
+      console.log(answers.length);
+
+      return [questions, answers]
     })
   ))
 }
@@ -164,7 +166,7 @@ async function test () {
       { id: '51ebe37f-0c0e-4637-a4ec-3af3eccb86c4', currentOrgId: 'ca29c42a-5a5e-4943-b076-f62ccb63bc31' }
     )
 
-    // console.log(request);
+    console.log(request);
 
   const diff = process.hrtime(time);
   // [ 1, 552 ]

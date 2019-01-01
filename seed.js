@@ -26,6 +26,7 @@ const { filter, flatten, map, pluck, zipObj } = require('rambda')
 const stringify = require('fast-json-stable-stringify')
 
 const Agent = require('./transform-agent')
+const Answer = require('./transform-answer')
 const Relationship = require('./transform-relationship')
 const Request = require('./transform-request')
 const QSet = require('./transform-question-set')
@@ -41,6 +42,9 @@ async function seed () {
       .select()
   //
     const agents = map(Agent, a)
+
+    const ans = await staging('kotahi.answer').select()
+    const answers = map(Answer, ans)
   //
   //
     const rels = await staging('kotahi.relationship')
@@ -67,14 +71,14 @@ async function seed () {
     const request = map(Request(questionSetMap), r)
 
     const ents = agents
+      .concat(answers)
       .concat(rel)
       .concat(questions)
       .concat(qSets)
       .concat(qSetQuestions)
       .concat(request)
 
-    console.log(questions)
-   // await t.seed(ents)
+      await t.seed(ents)
 
   } catch (err) {
     console.log({err});

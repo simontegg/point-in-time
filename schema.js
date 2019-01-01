@@ -58,6 +58,7 @@ module.exports = {
   answer_questionId:         { type: 'EntityID' },
   answer_orgId:              { type: 'EntityID' },
   answer_model:              { type: 'String' },
+  answer_answeredBy:         { type: 'EntityID' },
   answer_createdAt:          { type: 'Date' },
   answer_updatedAt:          { type: 'Date' },
 
