@@ -16,10 +16,13 @@ const db = lev('postgres://postgres:@localhost/lfb', {
   keyEncoding: require('charwise'),
   valueEncoding: 'json'
 })
+//
+//
+// const t = factory(db, schema)
 
 
-const t = factory(db, schema)
-
+const t = require('./lfb')
+// const f = require('./index')
 
 
 const { filter, flatten, map, pluck, zipObj } = require('rambda')
@@ -78,8 +81,9 @@ async function seed () {
       .concat(qSetQuestions)
       .concat(request)
 
-    console.log(answers);
-      // await t.seed(ents)
+    console.log(request);
+    await t.seed(ents)
+    //
 
   } catch (err) {
     console.log({err});

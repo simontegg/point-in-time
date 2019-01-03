@@ -70,6 +70,7 @@ function requestById (_, { currentOrgId, id }) {
     pull.asyncMap((fb, cb) => fb.q(tuples, { id }, requestSelect, cb)),
     pull.flatten(),
     pull.asyncMap((request, cb) => {
+      console.log({request});
       result = request
       const { createdAt, qSetId } = request
       const asyncOperations = [
@@ -82,6 +83,7 @@ function requestById (_, { currentOrgId, id }) {
     pull.map(([questions, answers]) => {
       result.questions = questions
       result.answers = answers
+      console.log({result});
 
       return result
     })
