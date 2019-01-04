@@ -15,7 +15,7 @@ const lev = levelPackager(leveldown)
   // valueEncoding: 'json'
 // })
 //
-const db = lev('./', {
+const db = lev('./level', {
   keyEncoding: require('charwise'),
   valueEncoding: 'json'
 })

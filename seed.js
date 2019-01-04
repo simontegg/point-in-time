@@ -30,11 +30,12 @@ const stringify = require('fast-json-stable-stringify')
 
 const Agent = require('./transform-agent')
 const Answer = require('./transform-answer')
+const File = require('./transform-file')
 const Relationship = require('./transform-relationship')
+const Report = require('./transform-report')
 const Request = require('./transform-request')
 const QSet = require('./transform-question-set')
 const Question = require('./transform-question')
-
 
 const performance = Knex(knexfile.performance)
 const staging = Knex(knexfile.staging)
@@ -73,6 +74,11 @@ async function seed () {
 
     const request = map(Request(questionSetMap), r)
 
+    const f = await staging('kotahi.file').select()
+    const files = flatten(map(File, f))
+    const rep = await staging('kotahi.report').select()
+    const reports = flatten(map(Report, rep))
+
     const ents = agents
       .concat(answers)
       .concat(rel)
@@ -80,8 +86,9 @@ async function seed () {
       .concat(qSets)
       .concat(qSetQuestions)
       .concat(request)
+      .concat(files)
+      .concat(reports)
 
-    console.log(request);
     await t.seed(ents)
     //
 
