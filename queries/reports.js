@@ -98,21 +98,34 @@ function reportById (_, { id }) {
   ))
 }
 
-
+function reportByRefersToId (_, { organizationId }) {
+  return promise(pull(
+    pull.once(lfb),
+    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
+    pull.asyncMap((fb, cb) => fb.q(tuples, { refersToId: organizationId }, reportSelect, cb)),
+    pull.map(reduceRelations),
+    pull.map(relationsAsArrays)
+  ))
+}
 
 async function test () {
   try {
-    const report = await reportById(
+    // const report = await reportById(
+      // null,
+      // { id: 'c147a23b-3969-4d8b-83c8-bf5fac1b2f0d' }
+    // )
+
+    const refersToReport = await reportByRefersToId(
       null, 
-      { id: 'c147a23b-3969-4d8b-83c8-bf5fac1b2f0d' }
+      { organizationId: 'ba79fbd7-ea9a-493f-b961-03b083fe4a84' }
     )
 
-    console.log(report);
+    console.log(refersToReport);
 
   const diff = process.hrtime(time);
   // [ 1, 552 ]
 
-    console.log(`Benchmark took ${diff[0] * NS_PER_SEC + diff[1]} nanoseconds`);
+    console.log(`Benchmark took ${diff[0] + diff[1] / NS_PER_SEC} seconds`);
 
   } catch (err) {
     console.log({err});
