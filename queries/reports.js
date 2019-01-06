@@ -1,7 +1,7 @@
 const lfb = require('../lfb')
 const pull = require('pull-stream')
 const paramap = require('pull-paramap')
-const { concat, reduce } = require('rambda')
+const { concat, keys, map, reduce } = require('rambda')
 
 const NS_PER_SEC = 1e9;
 const time = process.hrtime();
@@ -64,18 +64,37 @@ const reduceRelations = reduce((report, join) => {
   }
 
   report.fMap[join.fileId] = { id: join.fileId, name: join.fileName, url: join.url }
-  report.rtMap[join.refersToId] = join.refersToName
-  report.swMap[join.sharedWithId] = join.sharedWithName
+  report.rtMap[join.refersToId] = { id: join.refersToId, name: join.refersToName }
+  report.swMap[join.sharedWithId] = { id: join.sharedWithId, name: join.sharedWithName }
   
   return report
 }, {})
+
+const mapsToArrays = [
+  // Map -> Array
+  ['fMap', 'files'],
+  ['rtMap', 'refersTo'],
+  ['swMap', 'sharedWith']
+]
+
+function relationsAsArrays (report) {
+  for (let i = 0; i < mapsToArrays.length; i++) {
+    const tuple = mapsToArrays[i]
+    report[tuple[1]] = map(id => report[tuple[0]][id], keys(report[tuple[0]]))
+
+    delete report[tuple[0]]
+  }
+
+  return report
+}
 
 function reportById (_, { id }) {
   return promise(pull(
     pull.once(lfb),
     pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(tuples, { id }, reportSelect, cb)),
-    pull.map(reduceRelations)
+    pull.map(reduceRelations),
+    pull.map(relationsAsArrays)
   ))
 }
 
