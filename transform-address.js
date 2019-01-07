@@ -12,8 +12,8 @@ function transformAddress ({
     $e: id,
     address_orgId: organization_id,
     address_name: body.name,
-    address_createdAt: created_at,
-    address_updatedAt: created_at
+    address_createdAt: new Date(created_at),
+    address_updatedAt: new Date(created_at)
   }
 
   if (body.line1) address.address_line1 = body.line1

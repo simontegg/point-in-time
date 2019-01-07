@@ -1,5 +1,4 @@
 const Uuid = require('uuid/v4')
-const stringify = require('fast-json-stable-stringify')
 
 function transformLocality ({ 
   id, 
@@ -14,9 +13,11 @@ function transformLocality ({
     locality_type: area_type,
     locality_name: name,
     locality_code: code,
-    locality_createdAt: created_at,
-    locality_updatedAt: created_at
+    locality_createdAt: new Date(created_at),
+    locality_updatedAt: new Date(created_at)
   }
+
+  return locality
 }
 
 module.exports = transformLocality

@@ -28,9 +28,11 @@ const t = require('./lfb')
 const { filter, flatten, map, pluck, zipObj } = require('rambda')
 const stringify = require('fast-json-stable-stringify')
 
+const Address = require('./transform-address')
 const Agent = require('./transform-agent')
 const Answer = require('./transform-answer')
 const File = require('./transform-file')
+const Locality = require('./transform-locality')
 const Relationship = require('./transform-relationship')
 const Report = require('./transform-report')
 const Request = require('./transform-request')
@@ -42,28 +44,25 @@ const staging = Knex(knexfile.staging)
 
 async function seed () {
   try {
-    const a = await staging('kotahi.agent')
-      .select()
-  //
+    const a = await staging('kotahi.agent').select()
     const agents = map(Agent, a)
 
     const ans = await staging('kotahi.answer').select()
     const answers = map(Answer, ans)
-  //
-  //
-    const rels = await staging('kotahi.relationship')
-      .select()
 
+    const l = await staging('kotahi.area').select()
+    const localities = map(Locality, l)
+
+    const addr = await staging('kotahi.address').select()
+    const addresses = map(Address, addr)
+  //
+    const rels = await staging('kotahi.relationship').select()
     const rel = map(Relationship, rels)
 
-    const q = await staging('kotahi.question')
-      .select()
-
+    const q = await staging('kotahi.question').select()
     const questions = map(Question, q)
 
-    const qSet = await staging('kotahi.question_set')
-      .select()
-
+    const qSet = await staging('kotahi.question_set').select()
     const qs = map(QSet, qSet)
     const qSets = map(q => q[0], qs)
     const qSetQuestions = flatten(map(q => q[1], qs))
@@ -71,16 +70,18 @@ async function seed () {
     const questionSetMap = zipObj(map(qs => qs.qSet_name, qSets), map(qs => qs.$e, qSets))
 
     const r = await staging('kotahi.request').select()
-
     const request = map(Request(questionSetMap), r)
 
     const f = await staging('kotahi.file').select()
     const files = flatten(map(File, f))
+
     const rep = await staging('kotahi.report').select()
     const reports = flatten(map(Report, rep))
 
     const ents = agents
       .concat(answers)
+      .concat(localities)
+      .concat(addresses)
       .concat(rel)
       .concat(questions)
       .concat(qSets)
@@ -88,6 +89,8 @@ async function seed () {
       .concat(request)
       .concat(files)
       .concat(reports)
+
+    // console.log(localities);
 
     await t.seed(ents)
     //
