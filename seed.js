@@ -16,10 +16,6 @@ const db = lev('postgres://postgres:@localhost/lfb', {
   keyEncoding: require('charwise'),
   valueEncoding: 'json'
 })
-//
-//
-// const t = factory(db, schema)
-
 
 const t = require('./lfb')
 // const f = require('./index')
@@ -29,6 +25,7 @@ const { filter, flatten, map, pluck, zipObj } = require('rambda')
 const stringify = require('fast-json-stable-stringify')
 
 const Address = require('./transform-address')
+const Account = require('./transform-account')
 const Agent = require('./transform-agent')
 const Answer = require('./transform-answer')
 const File = require('./transform-file')
@@ -46,6 +43,9 @@ async function seed () {
   try {
     const a = await staging('kotahi.agent').select()
     const agents = map(Agent, a)
+
+    const acc = await staging('kotahi_private.account').select()
+    const accounts = map(Account, acc)
 
     const ans = await staging('kotahi.answer').select()
     const answers = map(Answer, ans)
@@ -79,6 +79,7 @@ async function seed () {
     const reports = flatten(map(Report, rep))
 
     const ents = agents
+      .concat(accounts)
       .concat(answers)
       .concat(localities)
       .concat(addresses)
@@ -89,8 +90,6 @@ async function seed () {
       .concat(request)
       .concat(files)
       .concat(reports)
-
-    console.log(addresses);
 
     await t.seed(ents)
     //

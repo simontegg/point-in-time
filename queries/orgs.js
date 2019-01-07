@@ -1,7 +1,8 @@
-const lfb = require('../lfb')
 const pull = require('pull-stream')
+const { contains } = require('rambda')
 
 const promise = require('./promise')
+const lfb = require('../lfb')
 
 const tuples = [
   ['?orgId', 'org_name', '?name'],
@@ -41,11 +42,62 @@ function allPublicOrgs () {
   ))
 }
 
+const memberOrgs = [
+  ['?id', 'org_name', '?name'],
+  ['?id', 'org_nzbnBusinessType', '?nzbnBusinessType'],
+
+  ['?relId', 'relationship_subjectId', '?memberId'],
+  ['?relId', 'relationship_objectId', '?id'],
+  ['?relId', 'relationship_type', '?type']
+]
+
+function orgsByMemberId (_, { memberId }) {
+  return promise(pull(
+    pull.once(lfb),
+    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
+    pull.asyncMap((fb, cb) => fb.q(
+      memberOrgs, 
+      { memberId, type: 'member_of' },
+      ['id', 'name', 'nzbnBusinessType'], 
+      cb
+    ))
+  ))
+}
+
+const ngoTuples = [
+  ['?id', 'org_name', '?name'],
+  ['?id', 'org_nzbnBusinessType', '?nzbnBusinessType']
+]
+
+function isNGO (nzbnBusinessType) {
+  return contains(
+    nzbnBusinessType, 
+    ['Charitable Trust', 'NZ Limited Company', 'Incorporated Society']
+  )
+}
+
+function allNGOs () {
+  return promise(pull(
+    pull.once(lfb),
+    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
+    pull.asyncMap((fb, cb) => fb.q(
+      ngoTuples, 
+      { nzbnBusinessType: isNGO },
+      ['id', 'name', 'nzbnBusinessType'], 
+      cb
+    ))
+  ))
+}
+
 async function test () {
 
   try {
-    const orgs = await allPublicOrgs()
-    console.log({ orgs });
+    // const orgs = await orgsByMemberId(null, { memberId: '29ded863-823c-45eb-ab50-618bc76e6818' })
+    // console.log({ orgs });
+
+
+    const ngos = await allNGOs()
+    console.log(ngos)
 
   } catch (err) {
     console.log({err});
