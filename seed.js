@@ -91,6 +91,8 @@ async function seed () {
       .concat(files)
       .concat(reports)
 
+    console.log(answers);
+
     await t.seed(ents)
     //
 

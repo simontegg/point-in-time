@@ -1,19 +1,19 @@
 const lfb = require('../lfb')
 const pull = require('pull-stream')
 
+const { map, pipe, uniqWith } = require('rambda')
+
 const promise = require('./promise')
 
 
 const questions = [
- ['?qSetId',         'qSet_name',                '?name'],
-//
+  ['?qSetId',         'qSet_name',                '?name'],
 //
   ['?qSetQuestionId', 'qSetQuestion_qSetId',      '?qSetId'],
   ['?qSetQuestionId', 'qSetQuestion_questionId',  '?questionId'],
 //
   ['?questionId',     'question_identifier',      '?identifier']
 ]
-
 
 function questionsByQuestionSetId (_, { name }) {
   return promise(pull(
@@ -28,23 +28,81 @@ function questionsByQuestionSetId (_, { name }) {
   ))
 }
 
+const questionsAsked = [
+  ['?requestId',      'request_requesteeId',      '?requesteeId'],
+  ['?requestId',      'request_qSetId',           '?qSetId'],
+
+  ['?qSetQuestionId', 'qSetQuestion_qSetId',      '?qSetId'],
+  ['?qSetQuestionId', 'qSetQuestion_questionId',  '?id'],
+//
+  ['?id',             'question_identifier',      '?identifier'],
+  ['?id',             'question_schema',          '?schema'],
+  ['?id',             'question_ui',              '?ui']
+]
+
+function parse (question) {
+  question.schema = JSON.parse(question.schema)
+  question.ui = JSON.parse(question.ui)
+  return question
+}
+
+const parseQuestions = pipe(uniqWith((x, y) => x.id === y.id), map(parse))
+
+function questionsAskedByOrgId (_, { organizationId }) {
+  return promise(pull(
+    pull.once(lfb),
+    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
+    pull.asyncMap((fb, cb) => fb.q(
+      questionsAsked, 
+      { requesteeId: organizationId }, 
+      ['id', 'identifier', 'schema', 'ui'],
+      cb
+    )),
+    pull.map(parseQuestions)
+  ))
+}
+
+const answers = [
+  ['?id', 'answer_questionId', '?questionId'],
+  ['?id', 'answer_orgId',      '?organizationId'],
+  ['?id', 'answer_model',      '?model'],
+  ['?id', 'answer_createdAt',  '?createdAt'],
+  ['?id', 'answer_updatedAt',  '?updatedAt']
+]
+
+function parseAnswers (answers) {
+  return map(answer => {
+    answer.model = JSON.parse(answer.model)
+    return answer
+  }, answers)
+}
+
+function answersByOrgId (_, { organizationId }) {
+  return promise(pull(
+    pull.once(lfb),
+    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
+    pull.asyncMap((fb, cb) => fb.q(
+      answers, 
+      { organizationId }, 
+      ['id', 'questionId', 'model'],
+      cb
+    )),
+    pull.map(parseAnswers)
+  ))
+}
 
 async function test () {
 
   try {
-    const request = await questionsByQuestionSetId(null, { name: 'Central TAS Desk Audit Question Set' })
-    console.log(request);
-    //
-    // const stream = lfb.txns.createReadStream()
-//
-    // stream.on('data', data => {
-      // console.log({data});
-    // })
-//
-//
-    // stream.on('error', data => {
-      // console.log({data});
-    // })
+    // const questions = await questionsByQuestionSetId(null, { name: 'Central TAS Desk Audit Question Set' })
+    // console.log(questions);
+
+    // const questionsA = await questionsAskedByOrgId(null, { organizationId: '18b85fb9-92ec-4c67-a82b-1c553d034c40' })
+    // console.log({questionsA});
+
+    const answers = await answersByOrgId(null, { organizationId: '07f108d0-0ede-4e7f-8919-97da88c18e4e' })
+    console.log({answers}, answers.length);
+
 
 
   } catch (err) {
