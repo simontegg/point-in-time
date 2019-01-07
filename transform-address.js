@@ -12,15 +12,14 @@ function transformAddress ({
     $e: id,
     address_orgId: organization_id,
     address_name: body.name,
+    address_line1: body.line1 || '',
+    address_line2: body.line2 || '',
+    address_suburb: body.suburb || '',
+    address_city: body.city || '',
+    address_availability: body.availability || '',
     address_createdAt: new Date(created_at),
     address_updatedAt: new Date(created_at)
   }
-
-  if (body.line1) address.address_line1 = body.line1
-  if (body.line2) address.address_line2 = body.line2
-  if (body.suburb) address.address_suburb = body.suburb
-  if (body.city) address.address_city = body.city
-  if (body.availability) address.address_availability = body.availability
 
   return address
 }

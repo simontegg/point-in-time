@@ -90,7 +90,7 @@ async function seed () {
       .concat(files)
       .concat(reports)
 
-    // console.log(localities);
+    console.log(addresses);
 
     await t.seed(ents)
     //
