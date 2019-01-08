@@ -7,15 +7,15 @@ function transformSettings ({
   created_at,
   updated_at
 }) {
-  const settings = {
+  const setting = {
     $e: Uuid(),
-    settings_currentOrgId: current_org_id,
-    settings_agentId: agent_id,
-    settings_createdAt: created_at,
-    settings_updatedAt: updated_at
+    setting_currentOrgId: current_org_id || '',
+    setting_personId: agent_id,
+    setting_createdAt: new Date(created_at),
+    setting_updatedAt: new Date(updated_at)
   }
 
-  return settings
+  return setting
 }
 
 module.exports = transformSettings

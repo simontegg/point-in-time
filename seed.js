@@ -35,6 +35,7 @@ const Report = require('./transform-report')
 const Request = require('./transform-request')
 const QSet = require('./transform-question-set')
 const Question = require('./transform-question')
+const Setting = require('./transform-settings')
 
 const performance = Knex(knexfile.performance)
 const staging = Knex(knexfile.staging)
@@ -78,6 +79,9 @@ async function seed () {
     const rep = await staging('kotahi.report').select()
     const reports = flatten(map(Report, rep))
 
+    const sets = await staging('kotahi.settings').select()
+    const settings = map(Setting, sets)
+
     const ents = agents
       .concat(accounts)
       .concat(answers)
@@ -90,8 +94,9 @@ async function seed () {
       .concat(request)
       .concat(files)
       .concat(reports)
+      .concat(settings)
 
-    console.log(answers);
+    // console.log(settings);
 
     await t.seed(ents)
     //

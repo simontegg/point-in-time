@@ -119,5 +119,10 @@ module.exports = {
   reportSharedWith_reportId:  { type: 'EntityID' },
   reportSharedWith_orgId:     { type: 'EntityID' },
   reportSharedWith_createdAt: { type: 'Date' },
-  reportSharedWith_updatedAt: { type: 'Date' }
+  reportSharedWith_updatedAt: { type: 'Date' },
+
+  setting_personId:          { type: 'EntityID' },
+  setting_currentOrgId:      { type: 'EntityID' },
+  setting_createdAt:         { type: 'Date' },
+  setting_updatedAt:         { type: 'Date' }
 }
