@@ -65,8 +65,6 @@ function requestById (_, { currentOrgId, id }) {
   let result
 
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(tuples, { id }, requestSelect, cb)),
     pull.flatten(),
     pull.asyncMap((request, cb) => {
@@ -143,8 +141,6 @@ function answersAtSubmitted ({ date, qSetId, orgId }, callback) {
 
 function currentAnswers ({ qSetId, orgId }, callback) {
   return pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       answers, 
       { qSetId, orgId }, 

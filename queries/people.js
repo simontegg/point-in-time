@@ -44,8 +44,6 @@ function reduceMembers (joins) {
 
 function membersByOrgId (_, { organizationId }) {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       orgMembers, 
       { organizationId, type: memberOrAdmin }, 
@@ -58,8 +56,6 @@ function membersByOrgId (_, { organizationId }) {
 
 function staffByOrgId (_, { organizationId }) {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       orgMembers, 
       { organizationId, type: 'staff_member_of' }, 

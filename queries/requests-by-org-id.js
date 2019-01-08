@@ -38,8 +38,6 @@ const requestSelect = [
 function requestsByOrgId (_, { organizationId }) {
   return new Promise ((resolve, reject) => {
     return pull(
-      pull.once(lfb),
-      pull.asyncMap((lfb, cb) => lfb.snap(cb)),
       pull.map(fb => {
         return [
           { op: requestsByRequestorId(fb), orgId: organizationId },

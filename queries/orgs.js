@@ -13,8 +13,6 @@ const notNull = nzbn => nzbn !== null
 
 function registeredOrgs () {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       tuples, 
       { nzbn: notNull }, 
@@ -31,8 +29,6 @@ const publicOrgTuples = [
 
 function allPublicOrgs () {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       publicOrgTuples, 
       { nzbnBusinessType: notNull }, 
@@ -53,8 +49,6 @@ const memberOrgs = [
 
 function orgsByMemberId (_, { memberId }) {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       memberOrgs, 
       { memberId, type: 'member_of' },
@@ -78,8 +72,6 @@ function isNGO (nzbnBusinessType) {
 
 function allNGOs () {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       ngoTuples, 
       { nzbnBusinessType: isNGO },

@@ -32,8 +32,6 @@ const fileSelect = ['id', 'name', 'url', 'organizationId', 'createdAt', 'updated
 
 function filesByOrgId (_, { organizationId }) {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(tuples, { organizationId }, fileSelect, cb))
   ))
 }

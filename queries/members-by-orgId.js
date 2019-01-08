@@ -12,8 +12,6 @@ const tuples = [
 
 function membersByOrgId (_, { organizationId }) {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       tuples, 
       { orgId: organizationId, type: 'member_of' }, 

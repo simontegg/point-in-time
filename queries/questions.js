@@ -17,8 +17,6 @@ const questions = [
 
 function questionsByQuestionSetId (_, { name }) {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       questions, 
       { name }, 
@@ -50,8 +48,6 @@ const parseQuestions = pipe(uniqWith((x, y) => x.id === y.id), map(parse))
 
 function questionsAskedByOrgId (_, { organizationId }) {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       questionsAsked, 
       { requesteeId: organizationId }, 
@@ -79,8 +75,6 @@ function parseAnswers (answers) {
 
 function answersByOrgId (_, { organizationId }) {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(
       answers, 
       { organizationId }, 

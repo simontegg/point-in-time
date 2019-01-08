@@ -90,8 +90,6 @@ function relationsAsArrays (report) {
 
 function reportById (_, { id }) {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(tuples, { id }, reportSelect, cb)),
     pull.map(reduceRelations),
     pull.map(relationsAsArrays)
@@ -100,8 +98,6 @@ function reportById (_, { id }) {
 
 function reportByRefersToId (_, { organizationId }) {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(tuples, { refersToId: organizationId }, reportSelect, cb)),
     pull.map(reduceRelations),
     pull.map(relationsAsArrays)

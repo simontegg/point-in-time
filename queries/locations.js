@@ -35,8 +35,6 @@ const select = [
 
 function addressesByOrgId (_, { organizationId }) {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(address, { organizationId }, select, cb))
   ))
 }
@@ -54,8 +52,6 @@ const localitySelect = ['id', 'type', 'name', 'code', 'createdAt', 'updatedAt']
 
 function allLocalitites () {
   return promise(pull(
-    pull.once(lfb),
-    pull.asyncMap((lfb, cb) => lfb.snap(cb)),
     pull.asyncMap((fb, cb) => fb.q(locality, {}, localitySelect, cb))
   ))
 }
